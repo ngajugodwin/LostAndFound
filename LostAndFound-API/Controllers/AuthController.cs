@@ -34,7 +34,7 @@ namespace LostAndFound_API.Controllers
             {
                 Code = "SUCCESS",
                 Message = "Login Successful",
-                Data = result.Resource
+                Data = result.Resource.User                
             });
         }
     }
