@@ -24,9 +24,18 @@ namespace LostAndFound_API.Controllers
             var result = await _authService.LoginAsync(accessResource.Email.ToLower(), accessResource.Password);
 
             if (!result.Success)
-                return Unauthorized(result.Message);
+                return Unauthorized(new 
+                {
+                    Code = "FAILED",
+                    Message = result.Message
+                });
 
-            return Ok(result.Resource);
+            return Ok(new
+            {
+                Code = "SUCCESS",
+                Message = "Login Successful",
+                Data = result.Resource
+            });
         }
     }
 }

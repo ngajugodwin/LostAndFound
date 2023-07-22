@@ -8,11 +8,11 @@ namespace LostAndFound_API.Mappings
     {
         public UserMappingProfile()
         {
-            CreateMap<User, UserResource>()
-               .ForMember(dest => dest.UserRoles, opt =>
-               {
-                   opt.MapFrom(src => src.UserRoles.Select(c => c.Role.Name));
-               });
+            CreateMap<User, UserResource>();
+               //.ForMember(dest => dest.UserRoles, opt =>
+               //{
+               //    opt.MapFrom(src => src.UserRoles.Select(c => c.Role.Name));
+               //});
 
             CreateMap<SaveUserResource, User>();
 

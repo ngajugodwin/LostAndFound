@@ -60,7 +60,11 @@ namespace LostAndFound_API.Controllers
             {
                 await _itemService.SaveAsync(itemToSave);
                 var itemToReturn = _mapper.Map<Item, ItemResource>(itemToSave);
-                return Ok(itemToReturn);
+                return Ok(new
+                {
+                    Code = "SUCCESS",
+                    Message = "New lost item created successfully!"
+                });
             }
             catch (Exception ex)
             {

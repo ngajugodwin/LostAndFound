@@ -38,12 +38,22 @@ namespace LostAndFound_API.Controllers
                     Message = result.Message,
                     Error = result.Errors
                 };
-                return BadRequest(errorData);
+                return BadRequest(new
+                {
+                    // Data = errorData
+                    Code = "FAILED",
+                    Message = errorData
+                });
             }
 
             var userToReturn = _mapper.Map<UserResource>(result.Resource);
 
-            return Ok(userToReturn);
+            return Ok(new
+            {
+                Code = "SUCCESS",
+                Message = "Account created successfully",
+                Data = userToReturn
+            });
         }
     }
 }
