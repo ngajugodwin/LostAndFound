@@ -43,25 +43,42 @@ builder.Services.AddSingleton(mapper);
 
 builder.Services.AddIdentityServices(builder.Configuration, builder.Environment);
 
-builder.Services.AddCors(opt =>
-{
-    opt.AddPolicy("CorsPolicy", policy =>
-    {
-        policy.AllowAnyHeader().AllowAnyMethod().Build();
-    });
-});
+//builder.Services.AddCors(opt =>
+//{
+//    opt.AddPolicy("CorsPolicy", policy =>
+//    {
+//        policy.AllowAnyHeader().AllowAnyMethod().Build();
+//    });
+//});
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+//app.UseSwagger();
+//app.UseSwaggerUI(c =>
+//{
+//    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Lost And Found API");
+//    c.RoutePrefix = string.Empty;
+//});
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+} 
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Lost And Found API");
+        c.RoutePrefix = string.Empty;
+    });
 }
 
+
+
 app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
+//app.UseCors("CorsPolicy");
 app.UseAuthorization();
 
 app.MapControllers();

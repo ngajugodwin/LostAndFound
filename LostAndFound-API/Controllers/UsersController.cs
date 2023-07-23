@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using LostAndFound_API.Domain.Services;
+using LostAndFound_API.Resources.Response;
 using LostAndFound_API.Resources.User;
+using LostAndFound_API.Services.Constants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LostAndFound_API.Controllers
@@ -24,11 +26,16 @@ namespace LostAndFound_API.Controllers
             var result = await _userService.GetUserByIdAsync(userId);
 
             if (!result.Success)
-                return BadRequest(result.Message);
+                return BadRequest(new ApiResponse(ApiResult.STATUS_FAILED, result.Message));
 
             var userToReturn = _mapper.Map<UserResource>(result.Resource);
 
-            return Ok(userToReturn);
+            return Ok(new ApiResponse
+            (
+                ApiResult.STATUS_SUCCESS,
+                "User profile fetched successfully",
+                userToReturn
+            ));
         }
     }
 }

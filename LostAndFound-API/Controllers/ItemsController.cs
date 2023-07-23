@@ -7,13 +7,16 @@ using LostAndFound_API.Domain.Services;
 using LostAndFound_API.Extensions;
 using LostAndFound_API.Helpers;
 using LostAndFound_API.Resources.Item;
+using LostAndFound_API.Resources.Response;
+using LostAndFound_API.Services.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace LostAndFound_API.Controllers
 {
-    [Route("api/[controller]")]
+  
     [ApiController]
+    [Route("api/[controller]")]
     public class ItemsController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -39,11 +42,11 @@ namespace LostAndFound_API.Controllers
             var item = await _itemService.GetItemByIdAsync(itemId);
 
             if (item.Resource == null)
-                return BadRequest("Item not found!");
+                return BadRequest(new ApiResponse(ApiResult.STATUS_FAILED, "Item not found!"));
 
             var itemToReturn = _mapper.Map<ItemResource>(item.Resource);
 
-            return Ok(itemToReturn);
+            return Ok(new ApiResponse(ApiResult.STATUS_SUCCESS, ApiResult.SUCCESS_MESSAGE, itemToReturn));
         }
 
         [HttpPost]
@@ -60,15 +63,20 @@ namespace LostAndFound_API.Controllers
             {
                 await _itemService.SaveAsync(itemToSave);
                 var itemToReturn = _mapper.Map<Item, ItemResource>(itemToSave);
-                return Ok(new
-                {
-                    Code = "SUCCESS",
-                    Message = "New lost item created successfully!"
-                });
+                return Ok(new ApiResponse
+                (
+                    ApiResult.STATUS_SUCCESS,
+                    "New lost item created successfully!",
+                    itemToReturn
+                ));
             }
             catch (Exception ex)
             {
-                throw;
+                return Ok(new ApiResponse
+               (
+                   ApiResult.STATUS_FAILED,
+                   ex.Message
+               ));
             }
         }
 
@@ -79,7 +87,7 @@ namespace LostAndFound_API.Controllers
 
             var itemToReturn = _mapper.Map<IEnumerable<ItemResource>>(items);
 
-            return Ok(itemToReturn);
+            return Ok(new ApiResponse(ApiResult.STATUS_SUCCESS, ApiResult.SUCCESS_MESSAGE, itemToReturn));
         }
 
         private Item ProcessPhoto(IFormFile file, Item item)

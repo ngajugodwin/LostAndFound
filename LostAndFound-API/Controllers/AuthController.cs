@@ -1,6 +1,8 @@
 ﻿using LostAndFound_API.Domain.Services;
 using LostAndFound_API.Extensions;
 using LostAndFound_API.Resources.Auth;
+using LostAndFound_API.Resources.Response;
+using LostAndFound_API.Services.Constants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LostAndFound_API.Controllers
@@ -24,18 +26,18 @@ namespace LostAndFound_API.Controllers
             var result = await _authService.LoginAsync(accessResource.Email.ToLower(), accessResource.Password);
 
             if (!result.Success)
-                return Unauthorized(new 
-                {
-                    Code = "FAILED",
-                    Message = result.Message
-                });
+                return Unauthorized(new ApiResponse
+                (
+                    ApiResult.STATUS_FAILED,
+                    result.Message
+                ));
 
-            return Ok(new
-            {
-                Code = "SUCCESS",
-                Message = "Login Successful",
-                Data = result.Resource.User                
-            });
+            return Ok(new ApiResponse
+            (
+                ApiResult.STATUS_SUCCESS,
+                "Login Successful",
+                result.Resource.User                
+            ));
         }
     }
 }

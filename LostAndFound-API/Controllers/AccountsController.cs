@@ -2,7 +2,9 @@
 using LostAndFound_API.Domain.Models.Identity;
 using LostAndFound_API.Domain.Services;
 using LostAndFound_API.Extensions;
+using LostAndFound_API.Resources.Response;
 using LostAndFound_API.Resources.User;
+using LostAndFound_API.Services.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,22 +40,22 @@ namespace LostAndFound_API.Controllers
                     Message = result.Message,
                     Error = result.Errors
                 };
-                return BadRequest(new
-                {
-                    // Data = errorData
-                    Code = "FAILED",
-                    Message = errorData
-                });
+                return BadRequest(new ApiResponse
+                (
+                    ApiResult.STATUS_FAILED,
+                    ApiResult.FAILED_MESSAGE,
+                    errorData
+                ));
             }
 
             var userToReturn = _mapper.Map<UserResource>(result.Resource);
 
-            return Ok(new
-            {
-                Code = "SUCCESS",
-                Message = "Account created successfully",
-                Data = userToReturn
-            });
+            return Ok(new ApiResponse
+            (
+                 ApiResult.STATUS_SUCCESS,
+                 "Account created successfully",
+                 userToReturn
+            ));
         }
     }
 }
