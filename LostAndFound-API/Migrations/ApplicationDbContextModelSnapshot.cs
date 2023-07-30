@@ -221,6 +221,36 @@ namespace LostAndFound_API.Migrations
                     b.ToTable("Items");
                 });
 
+            modelBuilder.Entity("LostAndFound_API.Domain.Models.ItemComment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("CommentByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommentByUserId");
+
+                    b.HasIndex("ItemId");
+
+                    b.ToTable("ItemComments");
+                });
+
             modelBuilder.Entity("LostAndFound_API.Domain.Models.Token", b =>
                 {
                     b.Property<int>("Id")
@@ -251,6 +281,43 @@ namespace LostAndFound_API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Tokens");
+                });
+
+            modelBuilder.Entity("LostAndFound_API.Domain.Models.UserItemBookmark", b =>
+                {
+                    b.Property<long>("BookmarkByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ItemBookmarkId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BookmarkByUserId", "ItemBookmarkId");
+
+                    b.HasIndex("ItemBookmarkId");
+
+                    b.ToTable("UserItemBookmarks");
+                });
+
+            modelBuilder.Entity("LostAndFound_API.Domain.Models.UserNotificationSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserNotificationSettings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -378,11 +445,60 @@ namespace LostAndFound_API.Migrations
                     b.Navigation("ReportedByUser");
                 });
 
+            modelBuilder.Entity("LostAndFound_API.Domain.Models.ItemComment", b =>
+                {
+                    b.HasOne("LostAndFound_API.Domain.Models.Identity.User", "CommentByUser")
+                        .WithMany("ItemCommentByUser")
+                        .HasForeignKey("CommentByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LostAndFound_API.Domain.Models.Item", "Item")
+                        .WithMany("ItemComments")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CommentByUser");
+
+                    b.Navigation("Item");
+                });
+
             modelBuilder.Entity("LostAndFound_API.Domain.Models.Token", b =>
                 {
                     b.HasOne("LostAndFound_API.Domain.Models.Identity.User", "User")
                         .WithMany("Tokens")
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LostAndFound_API.Domain.Models.UserItemBookmark", b =>
+                {
+                    b.HasOne("LostAndFound_API.Domain.Models.Identity.User", "BookmarkByUser")
+                        .WithMany("UserItemBookmarks")
+                        .HasForeignKey("BookmarkByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LostAndFound_API.Domain.Models.Item", "ItemBookmark")
+                        .WithMany("UserItemBookmarks")
+                        .HasForeignKey("ItemBookmarkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BookmarkByUser");
+
+                    b.Navigation("ItemBookmark");
+                });
+
+            modelBuilder.Entity("LostAndFound_API.Domain.Models.UserNotificationSetting", b =>
+                {
+                    b.HasOne("LostAndFound_API.Domain.Models.Identity.User", "User")
+                        .WithOne("UserNotificationSetting")
+                        .HasForeignKey("LostAndFound_API.Domain.Models.UserNotificationSetting", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -434,11 +550,25 @@ namespace LostAndFound_API.Migrations
                 {
                     b.Navigation("ItemClaimedByUser");
 
+                    b.Navigation("ItemCommentByUser");
+
                     b.Navigation("ItemReportedByUser");
 
                     b.Navigation("Tokens");
 
+                    b.Navigation("UserItemBookmarks");
+
+                    b.Navigation("UserNotificationSetting")
+                        .IsRequired();
+
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("LostAndFound_API.Domain.Models.Item", b =>
+                {
+                    b.Navigation("ItemComments");
+
+                    b.Navigation("UserItemBookmarks");
                 });
 #pragma warning restore 612, 618
         }

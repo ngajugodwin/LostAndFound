@@ -24,7 +24,7 @@ namespace LostAndFound_API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNewAccountAsync([FromForm] SaveUserResource saveUserResource)
+        public async Task<IActionResult> CreateNewAccountAsync([FromBody] SaveUserResource saveUserResource)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState.GetErrorMessages());

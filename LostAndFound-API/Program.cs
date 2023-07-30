@@ -1,5 +1,6 @@
 using AutoMapper;
 using LostAndFound_API.Domain.Models.Identity;
+using LostAndFound_API.Domain.Notification;
 using LostAndFound_API.Domain.Repositories;
 using LostAndFound_API.Domain.Services;
 using LostAndFound_API.Extensions;
@@ -28,10 +29,19 @@ builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IGenericRepository, GenericRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
+builder.Services.AddScoped<IUserItemBookmarkRepository, UserItemBookmarkRepository>();
+builder.Services.AddScoped<IUserNotificationSettingRepository, UserNotificationSettingRepository>();
+
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IItemService, ItemService>();
+
+#region Mail Configuration
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.AddSingleton<INotificationService<Mail>, MailService>();
+#endregion
+
 
 var config = new MapperConfiguration(cfg =>
 {
@@ -64,13 +74,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-} 
+}
 else
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Lost And Found API");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Lost And Found API v1");
         c.RoutePrefix = string.Empty;
     });
 }

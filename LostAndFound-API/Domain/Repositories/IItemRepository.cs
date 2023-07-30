@@ -1,4 +1,5 @@
 ﻿using LostAndFound_API.Domain.Models;
+using LostAndFound_API.Resources.Item;
 
 namespace LostAndFound_API.Domain.Repositories
 {
@@ -10,6 +11,8 @@ namespace LostAndFound_API.Domain.Repositories
 
         Task CreateItem(Item item);
 
-        Task<IEnumerable<Item>> ListAsync();
+        Task<IEnumerable<Item>> ListAsync(ItemQuery itemQuery);
+
+        Task<List<ItemComment>> GetItemCommentsAsync(int itemId);
     }
 }

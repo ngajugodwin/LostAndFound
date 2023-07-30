@@ -1,4 +1,5 @@
 ﻿using LostAndFound_API.Domain.Models;
+using LostAndFound_API.Resources.Item;
 
 namespace LostAndFound_API.Extensions
 {
@@ -20,6 +21,28 @@ namespace LostAndFound_API.Extensions
             }
 
             return string.Empty;
+        }
+
+        public static List<ItemCommentResource> GetUserComments(this ICollection<ItemComment> itemComments)
+        {
+            if(itemComments.Count() > 0)
+            {
+                var comments = new List<ItemCommentResource>();
+
+                foreach (var comment in itemComments)
+                {
+                    comments.Add(new ItemCommentResource
+                    {
+                        Comment = comment.Comment,
+                        CommentedBy = comment.CommentByUser != null ? comment.CommentByUser.Email : string.Empty,
+                        CreatedAt = comment.CreatedAt
+                    });
+                }
+
+                return comments;
+            }
+
+            return new List<ItemCommentResource>();
         }
     }
 }

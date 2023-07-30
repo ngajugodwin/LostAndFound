@@ -1,4 +1,5 @@
-﻿using LostAndFound_API.Domain.Models.Identity;
+﻿using LostAndFound_API.Domain.Models;
+using LostAndFound_API.Domain.Models.Identity;
 using LostAndFound_API.Domain.Repositories;
 using LostAndFound_API.Domain.Services;
 using LostAndFound_API.Domain.Services.Communication;
@@ -14,15 +15,17 @@ namespace LostAndFound_API.Services
         private readonly SignInManager<User> _signInManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationUserManager _applicationUserManager;
+        private readonly IGenericRepository _genericRepository;
 
         public UserService(IUnitOfWork unitOfWork, RoleManager<Domain.Models.Identity.Role> roleManager,
                            SignInManager<User> signInManager,
-                           ApplicationUserManager applicationUserManager)
+                           ApplicationUserManager applicationUserManager, IGenericRepository genericRepository)
         {
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _applicationUserManager = applicationUserManager;
+            _genericRepository = genericRepository;
         }
 
         public async Task<UserResponse> SaveAsync(User user, string password)
@@ -41,6 +44,14 @@ namespace LostAndFound_API.Services
 
                     if (savedUser != null)
                         await _applicationUserManager.AddToRoleAsync(savedUser, RoleName.USER);
+
+                    await _genericRepository.AddAsync<UserNotificationSetting>(new UserNotificationSetting
+                    {
+                        Status = false,
+                        UserId = user.Id
+                    });
+
+                    await _unitOfWork.CompleteAsync();
 
                     return new UserResponse(user);
                 }

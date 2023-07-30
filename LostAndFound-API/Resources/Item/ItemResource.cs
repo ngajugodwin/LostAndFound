@@ -15,5 +15,14 @@ namespace LostAndFound_API.Resources.Item
         public bool IsActive { get; set; }
         public string Contact { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+
+        public long ReportedByUserId { get; set; }
+
+        public List<ItemCommentResource> Comments { get; set; }
+
+        public ItemResource()
+        {
+            Comments = new List<ItemCommentResource>();
+        }
     }
 }

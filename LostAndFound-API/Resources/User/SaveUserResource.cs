@@ -17,10 +17,5 @@ namespace LostAndFound_API.Resources.User
         [Required]
         public string Password { get; set; } = string.Empty;
 
-
-        public SaveUserResource()
-        {
-
-        }
     }
 }

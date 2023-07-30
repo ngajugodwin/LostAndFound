@@ -23,7 +23,12 @@ namespace LostAndFound_API.Domain.Models.Identity
 
         public virtual ICollection<Item> ItemReportedByUser { get; set; }
         public virtual ICollection<Item> ItemClaimedByUser { get; set; }
-    
+
+        public virtual ICollection<ItemComment> ItemCommentByUser { get; set; }
+
+        public virtual ICollection<UserItemBookmark> UserItemBookmarks { get; set; }
+
+        public virtual UserNotificationSetting UserNotificationSetting { get; set; }
 
         public User()
         {
@@ -31,6 +36,8 @@ namespace LostAndFound_API.Domain.Models.Identity
             UserRoles = new HashSet<UserRole>();
             ItemReportedByUser = new HashSet<Item>();
             ItemClaimedByUser = new HashSet<Item>();
+            ItemCommentByUser = new HashSet<ItemComment>();
+            UserItemBookmarks = new HashSet<UserItemBookmark>();
             CreatedAt = DateTime.Now;
         }
     }

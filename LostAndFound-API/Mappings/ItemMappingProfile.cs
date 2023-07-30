@@ -13,6 +13,10 @@ namespace LostAndFound_API.Mappings
                 .ForMember(dest => dest.Contact, opt =>
                 {
                     opt.MapFrom(src => src.GetPreferredContactInformation());
+                })
+                .ForMember(dest => dest.Comments, opt =>
+                {
+                    opt.MapFrom(src => src.ItemComments.GetUserComments());
                 });
 
             CreateMap<ItemResource, Item>();

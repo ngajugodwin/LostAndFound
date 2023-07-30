@@ -23,6 +23,7 @@ namespace LostAndFound_API.Controllers
         private readonly IItemService _itemService;
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private Cloudinary _cloudinary;
+        
 
         public ItemsController(IMapper mapper,
             IItemService itemService, 
@@ -31,7 +32,6 @@ namespace LostAndFound_API.Controllers
             _mapper = mapper;
             _itemService = itemService;
             _cloudinaryConfig = cloudinaryConfig;
-
             Account acct = new Account(_cloudinaryConfig.Value.CloudName, _cloudinaryConfig.Value.ApiKey, _cloudinaryConfig.Value.ApiSecret);
             _cloudinary = new Cloudinary(acct);
         }
@@ -42,11 +42,55 @@ namespace LostAndFound_API.Controllers
             var item = await _itemService.GetItemByIdAsync(itemId);
 
             if (item.Resource == null)
-                return BadRequest(new ApiResponse(ApiResult.STATUS_FAILED, "Item not found!"));
+                return Ok(new ApiResponse(ApiResult.STATUS_FAILED, "Item not found!"));
 
             var itemToReturn = _mapper.Map<ItemResource>(item.Resource);
 
             return Ok(new ApiResponse(ApiResult.STATUS_SUCCESS, ApiResult.SUCCESS_MESSAGE, itemToReturn));
+        }
+
+
+        [HttpGet("{itemId}/getItemComments")]
+        public async Task<IActionResult> GetItemCommentsAsync(int itemId)
+        {
+            var itemComments = await _itemService.GetItemCommentsAsync(itemId);
+
+            if (itemComments.Count() <= 0)
+            {
+                return Ok(new ApiResponse(ApiResult.STATUS_FAILED, "There are no comments for specified item"));
+            }
+
+            var comments = new List<ItemCommentResource>();
+
+            foreach (var comment in itemComments)
+            {
+                comments.Add(new ItemCommentResource
+                {
+                    Comment = comment.Comment,
+                    CommentedBy = comment.CommentByUser != null ? comment.CommentByUser.FullName : string.Empty,
+                    CreatedAt = comment.CreatedAt
+                });
+            }
+
+            return Ok(new ApiResponse(ApiResult.STATUS_SUCCESS, ApiResult.SUCCESS_MESSAGE, comments));
+        }
+
+        [HttpPut("closeLostItem")]
+        public async Task<IActionResult> CloseLostItemAsync([FromBody] CloseLostItemResource closeLostItemResource)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.GetErrorMessages());
+
+            var result = await _itemService.CloseLostItemAsync(closeLostItemResource.ItemId, 
+                                                               closeLostItemResource.UserId, 
+                                                               closeLostItemResource.ClosingRemarks);
+
+            if (!result.Success)
+                return Ok(new ApiResponse(ApiResult.STATUS_FAILED, result.Message));
+
+            var itemToReturn = _mapper.Map<ItemResource>(result.Resource);
+
+            return Ok(new ApiResponse(ApiResult.STATUS_SUCCESS, "Item close successfully", itemToReturn));
         }
 
         [HttpPost]
@@ -81,14 +125,43 @@ namespace LostAndFound_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListAsync()
+        public async Task<IActionResult> ListAsync([FromQuery] ItemQuery itemQuery)
         {
-            var items = await _itemService.ListAsync();
+            var items = await _itemService.ListAsync(itemQuery);
 
             var itemToReturn = _mapper.Map<IEnumerable<ItemResource>>(items);
 
+            if (itemToReturn.Count() <= 0)
+            {
+                return Ok(new ApiResponse(ApiResult.STATUS_SUCCESS, "No data to return"));
+            }
+
             return Ok(new ApiResponse(ApiResult.STATUS_SUCCESS, ApiResult.SUCCESS_MESSAGE, itemToReturn));
         }
+
+        [HttpPost("addUserCommentToItem")]
+        public async Task<IActionResult> AddUserCommentAsync([FromBody] UserCommentResource userCommentResource)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.GetErrorMessages());
+
+            var result = await _itemService
+                    .AddUserCommentToItem(userCommentResource.Comment, userCommentResource.UserId, userCommentResource.ItemId);
+
+            if (!result.Success)
+            {
+                return Ok(new ApiResponse(ApiResult.STATUS_FAILED, result.Message));
+            }
+
+            return Ok(new ApiResponse(ApiResult.STATUS_SUCCESS, ApiResult.SUCCESS_MESSAGE, new
+            {
+                Comment = result.Resource.Comment,
+                UserId = result.Resource.CommentByUserId,
+                ItemId = result.Resource.ItemId
+            }));
+        }
+
+
 
         private Item ProcessPhoto(IFormFile file, Item item)
         {

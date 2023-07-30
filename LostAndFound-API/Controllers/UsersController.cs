@@ -26,7 +26,7 @@ namespace LostAndFound_API.Controllers
             var result = await _userService.GetUserByIdAsync(userId);
 
             if (!result.Success)
-                return BadRequest(new ApiResponse(ApiResult.STATUS_FAILED, result.Message));
+                return Ok(new ApiResponse(ApiResult.STATUS_FAILED, result.Message));
 
             var userToReturn = _mapper.Map<UserResource>(result.Resource);
 

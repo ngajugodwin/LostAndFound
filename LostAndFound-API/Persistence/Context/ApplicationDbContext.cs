@@ -14,6 +14,9 @@ namespace LostAndFound_API.Persistence.Context
 
         public DbSet<Item> Items { get; set; }
         public DbSet<Token> Tokens { get; set; }
+        public DbSet<ItemComment> ItemComments { get; set; }
+        public DbSet<UserItemBookmark> UserItemBookmarks { get; set; }
+        public DbSet<UserNotificationSetting> UserNotificationSettings { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
           : base(options)
@@ -22,12 +25,14 @@ namespace LostAndFound_API.Persistence.Context
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new ItemConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
+            modelBuilder.ApplyConfiguration(new ItemCommentConfiguration());
+            modelBuilder.ApplyConfiguration(new UserItemBookmarkConfiguration());
+            modelBuilder.ApplyConfiguration(new UserNotificationSettingConfiguration());            
         }
     }
 }

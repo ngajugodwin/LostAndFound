@@ -23,6 +23,15 @@ namespace LostAndFound_API.Domain.Models
         public virtual User? ClaimedByUser { get; set; }
         public string? ClosingRemarks { get; set; }
 
+        public virtual ICollection<ItemComment> ItemComments { get; set; }
+        public virtual ICollection<UserItemBookmark> UserItemBookmarks { get; set; }
+
+        public Item()
+        {
+            ItemComments = new HashSet<ItemComment>();
+            UserItemBookmarks = new HashSet<UserItemBookmark>();
+        }
+
     }
 
     public enum ModeOfContact 
